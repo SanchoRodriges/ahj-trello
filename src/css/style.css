@@ -1,0 +1,52 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    color: #999;
+}
+
+.untrello {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.untrello .column {
+    width: 300px;
+    border: 1px solid #ccc;
+}
+
+.untrello .column .header {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.untrello .column .task {
+    width: 280px;
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+
+.untrello .column .task.selected {
+    border: 1px solid #777;
+}
+
+.untrello .column .task.dragged {
+    position: absolute;
+    border: 1px solid #777;
+    background-color: #fff;
+}
+
+.untrello .column .add {
+    margin: 10px;
+    color: #5b5bff;
+}
+
+.untrello .column .add:hover {
+    color: #00f;
+    cursor: pointer;
+}
