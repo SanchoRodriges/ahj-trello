@@ -23,11 +23,29 @@ body {
 }
 
 .untrello .column .task {
+    position: relative;
     width: 280px;
     margin: 10px;
     padding: 10px;
     border: 1px solid #ccc;
     cursor: pointer;
+}
+
+.untrello .column .task .remove {
+    display: none;
+    transform: rotate(45deg);
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    background-color: #fff;
+}
+
+.untrello .column .task .remove:hover {
+    color: #000;
+}
+
+.untrello .column .task:hover .remove {
+    display: inline;
 }
 
 
@@ -46,7 +64,34 @@ body {
     color: #5b5bff;
 }
 
+.untrello .column .add.hidden {
+    display: none;
+}
+
 .untrello .column .add:hover {
     color: #00f;
     cursor: pointer;
+}
+
+.untrello .column .add-task-form {
+    margin: 10px;
+}
+
+.untrello .column .add-task-form.hidden {
+    display: none;
+}
+
+.untrello .column .add-task-input {
+    width: 100%;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    padding: 5px;
+}
+
+.untrello .column .add-task-ok {
+
+}
+
+.untrello .column .add-task-cancel {
+
 }

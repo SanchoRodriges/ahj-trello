@@ -19,5 +19,6 @@
       "extends": ["plugin:jest/recommended"],
       "rules": { "jest/prefer-expect-assertions": "off" }
     }
-  ]
+  ],
+  "parser": "@babel/eslint-parser"
 }
