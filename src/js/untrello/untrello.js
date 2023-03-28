@@ -17,21 +17,99 @@ export default class UnTrello {
     this.deleteTask();
   }
 
+  mouseDown = (e) => {
+    if (e.target.classList.contains("task")) {
+      e.preventDefault();
+
+      this.actualItem = e.target;
+      this.actualItemX =
+        e.clientX - this.actualItem.getBoundingClientRect().left;
+      this.actualItemY =
+        e.clientY - this.actualItem.getBoundingClientRect().top;
+      this.actualItem.classList.add("selected");
+
+      // id записи в объекте data
+      const columnId = this.actualItem.closest(".column").dataset.id;
+      const itemId = this.actualItem.dataset.id;
+      this.removeDataElement = { columnId, itemId };
+
+      // создаю проекцию
+      const proection = document.createElement("div");
+      proection.classList.add("proection");
+      // записываю проекцию в свойство
+      this.proection = proection;
+      // добавляю после актуального элемента
+      this.actualItem.insertAdjacentElement("afterend", this.proection);
+
+      document.documentElement.addEventListener("mouseup", this.mouseUp);
+      document.documentElement.addEventListener("mousemove", this.mouseMove);
+    }
+  };
+
+  mouseMove = (e) => {
+    // позиционирую элемент
+    this.actualItem.style.left = e.pageX - this.actualItemX + "px";
+    this.actualItem.style.top = e.pageY - this.actualItemY + "px";
+    this.actualItem.classList.add("dragged");
+    // добавляю проекции размеры
+    this.proection.style.height = this.actualItem.offsetHeight + "px";
+    this.proection.style.width = this.actualItem.offsetWidth + "px";
+    // получаю объект под курсором
+    const target = e.target;
+    if (target.classList.contains("task")) {
+      const { y, height } = target.getBoundingClientRect();
+      const appendPosition =
+        y + height / 2 > e.clientY ? "beforebegin" : "afterend";
+      target.insertAdjacentElement(appendPosition, this.proection);
+    }
+  };
+
+  mouseUp = (e) => {
+    this.actualItem.classList.remove("selected");
+    this.actualItem.classList.remove("dragged");
+    this.actualItem.style.left = "";
+    this.actualItem.style.top = "";
+    this.proection.insertAdjacentElement("afterend", this.actualItem);
+
+    // this.actualItem = undefined;
+    this.proection.remove();
+
+    // добавляем новый элемент в объект data
+    const thisColumnId = this.actualItem.closest(".column").dataset.id;
+    let previousId = this.actualItem.previousSibling.dataset.id;
+
+    previousId = previousId ? Number(previousId) + 1 : 0;
+    console.log(typeof previousId);
+    this.data[thisColumnId].tasks.splice(
+      previousId,
+      0,
+      this.actualItem.innerText
+    );
+
+    // удаляем старый элемент из объекта data
+    this.data[this.removeDataElement.columnId].tasks.splice(
+      this.removeDataElement.itemId,
+      1
+    );
+
+    LocalStorage.set(this.data);
+    this.init();
+
+    document.documentElement.removeEventListener("mouseup", this.mouseUp);
+    document.documentElement.removeEventListener("mousemove", this.mouseMove);
+  };
+
   deleteTask() {
     const remove = this.wrapper.querySelectorAll(".remove");
     remove.forEach((el) => {
       el.addEventListener("click", (e) => {
         const thisColumn = el.closest(".column");
         const thisTask = el.closest(".task");
-        console.log(thisColumn.dataset.id);
 
         this.data[thisColumn.dataset.id].tasks.splice(thisTask.dataset.id, 1);
-        // .splice(thisTask.dataset.id, 1);
-        console.log(this.data[thisColumn.dataset.id].tasks);
 
         LocalStorage.set(this.data);
         this.init();
-        // console.log('sadf');
       });
     });
   }
@@ -83,64 +161,6 @@ export default class UnTrello {
     });
   }
 
-  mouseDown = (e) => {
-    if (e.target.classList.contains("task")) {
-      e.preventDefault();
-
-      this.actualItem = e.target;
-      this.actualItemX =
-        e.clientX - this.actualItem.getBoundingClientRect().left;
-      this.actualItemY =
-        e.clientY - this.actualItem.getBoundingClientRect().top;
-      this.actualItem.classList.add("selected");
-
-      document.documentElement.addEventListener("mouseup", this.mouseUp);
-      document.documentElement.addEventListener("mouseover", this.mouseOver);
-      document.documentElement.addEventListener("mousemove", this.mouseMove);
-    }
-  };
-
-  mouseMove = (e) => {
-    this.actualItem.style.left = e.pageX - this.actualItemX + "px";
-    this.actualItem.style.top = e.pageY - this.actualItemY + "px";
-    this.actualItem.classList.add("dragged");
-  };
-
-  mouseOver = (e) => {
-    console.log(e.target);
-
-    this.actualItem.hidden = true;
-    let elemBelow = document.elementFromPoint(e.clientX, e.clientY);
-    this.actualItem.hidden = false;
-
-    console.log(elemBelow);
-
-    // if (elemBelow.classList.contains('task')) {
-    //   console.log(elemBelow);
-    //   this.shadow = document.createElement('div');
-    //   this.shadow.style.height = '200px';
-
-    //   elemBelow.insertAdjacentElement("afterend", this.shadow);
-
-    // } else if (elemBelow.classList.contains('column')) {
-    //   elemBelow.insertAdjacentElement("afterend", this.shadow);
-    // }
-  };
-
-  mouseUp = (e) => {
-    // const mouseUpItem = e.target;
-    // const column = mouseUpItem.closest('.column');
-
-    // column.insertBefore(this.actualItem, mouseUpItem);
-    this.actualItem.classList.remove("selected");
-    this.actualItem.classList.remove("dragged");
-    this.actualItem = undefined;
-
-    document.documentElement.removeEventListener("mouseup", this.mouseUp);
-    document.documentElement.removeEventListener("mousemove", this.mouseMove);
-    document.documentElement.removeEventListener("mouseover", this.mouseOver);
-  };
-
   init() {
     this.data = LocalStorage.get();
 
@@ -149,7 +169,6 @@ export default class UnTrello {
     for (let i = 0; i < this.data.length; i++) {
       const column = document.createElement("div");
       column.className = "column";
-      // column.dataset.id = this.data[i].id;
       column.dataset.id = i;
 
       const columnHeader = document.createElement("div");
@@ -163,7 +182,6 @@ export default class UnTrello {
         task.className = "task";
         task.textContent = this.data[i].tasks[e];
         task.dataset.id = e;
-        task.setAttribute("draggable", "true");
 
         const remove = document.createElement("span");
         remove.className = "remove";
@@ -191,49 +209,3 @@ export default class UnTrello {
     this.events();
   }
 }
-
-// events() {
-
-//   document.addEventListener("dragstart", (e) => {
-//     e.target.classList.add("dragged");
-//     const clone = e.target.cloneNode(true);
-//     e.target.insertAdjacentHTML("afterend", clone)
-
-//     const columns = document.querySelectorAll(".column");
-
-//     columns.forEach((item) => {
-//       item.addEventListener("dragover", (e) => {
-//         const dragging = document.querySelector(".dragged");
-//         const headerColumn = item.querySelector(".header");
-//         const applyAfter = getNewPosition(item, e.clientY);
-
-//         if (applyAfter) {
-//           applyAfter.insertAdjacentElement("afterend", dragging);
-//         } else {
-//           headerColumn.insertAdjacentElement("afterend", dragging)
-//         }
-//       });
-//     });
-
-//     function getNewPosition(column, posY) {
-//       const cards = column.querySelectorAll(".task:not(.dragged)");
-
-//       let result;
-
-//       for (let refer_card of cards) {
-//         const box = refer_card.getBoundingClientRect();
-//         const boxCenterY = box.y + box.height / 2;
-
-//         if (posY >= boxCenterY) result = refer_card;
-//       }
-
-//       return result;
-//     }
-
-//   });
-
-//   document.addEventListener("dragend", (e) => {
-//     e.target.classList.remove("dragged");
-//   });
-
-// }

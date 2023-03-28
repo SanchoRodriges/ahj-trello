@@ -17,12 +17,12 @@ body {
     border: 1px solid #ccc;
 }
 
-.untrello .column .header {
+.header {
     padding: 10px;
     border-bottom: 1px solid #ccc;
 }
 
-.untrello .column .task {
+.task {
     position: relative;
     width: 280px;
     margin: 10px;
@@ -31,7 +31,7 @@ body {
     cursor: pointer;
 }
 
-.untrello .column .task .remove {
+.task .remove {
     display: none;
     transform: rotate(45deg);
     position: absolute;
@@ -40,58 +40,59 @@ body {
     background-color: #fff;
 }
 
-.untrello .column .task .remove:hover {
+.task .remove:hover {
     color: #000;
 }
 
-.untrello .column .task:hover .remove {
+.task:hover .remove {
     display: inline;
 }
 
 
-.untrello .column .task.selected {
+.task.selected {
     border: 1px solid #777;
 }
 
-.untrello .column .task.dragged {
+.task.dragged {
     position: absolute;
     border: 1px solid #777;
     background-color: #fff;
+    pointer-events: none;
 }
 
-.untrello .column .add {
+.add {
     margin: 10px;
     color: #5b5bff;
 }
 
-.untrello .column .add.hidden {
+.add.hidden {
     display: none;
 }
 
-.untrello .column .add:hover {
+.add:hover {
     color: #00f;
     cursor: pointer;
 }
 
-.untrello .column .add-task-form {
+.add-task-form {
     margin: 10px;
 }
 
-.untrello .column .add-task-form.hidden {
+.add-task-form.hidden {
     display: none;
 }
 
-.untrello .column .add-task-input {
+.add-task-input {
     width: 100%;
     margin-bottom: 10px;
     border: 1px solid #ccc;
     padding: 5px;
 }
 
-.untrello .column .add-task-ok {
+.add-task-ok {
 
 }
 
-.untrello .column .add-task-cancel {
+.add-task-cancel {
 
 }
